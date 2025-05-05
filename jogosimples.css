@@ -1,0 +1,14 @@
+body{
+    margin: 0;
+    background-color: #87CEEB; /* Azul céu */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+}
+
+canvas {
+    border: 2px solid #000;
+    background-color: #add8e6; /* Azul claro */
+  }
