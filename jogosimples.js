@@ -1,11 +1,13 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const backgroundImg = new Image();
-backgroundImg.src = "jogo.jpeg"; // Caminho da sua imagem
+backgroundImg.src = "jogo.jpeg"; // Caminho da imagem de fundo
 
 const playerImg = new Image();
-  playerImg.src = "images.png";
+  playerImg.src = "images.png"; // caminho da imagem personagem
 
+const obstaculosImg = new Image();
+ obstaculosImg.src = "mesajogo.png"; //caminho imagem do obstaculo
 
 let backgroundX = 0;
 const backgroundSpeed = 2; // Velocidade do fundo
@@ -14,8 +16,8 @@ const groundY = 300;
 const player = {
   x: 100,
   y: groundY,
-  width: 50,
-  height: 50,
+  width: 80,
+  height: 80,
   velY: 0,
   gravity: 0.5,
   jumpStrength: -12,
@@ -28,6 +30,8 @@ let nextObstacleDelay = getRandomDelay();
 
 let score = 0;
 let gameOver = false;
+
+const hitboxMargin = 10;
 
 function getRandomDelay() {
   return Math.random() * 1500 + 1000; // entre 1s e 2.5s
@@ -44,8 +48,8 @@ function spawnObstacle() {
   obstacles.push({
     x: canvas.width,
     y: groundY,
-    width: 50,
-    height: 50,
+    width: 80,
+    height: 80,
     speed: 4
   });
 }
@@ -78,11 +82,27 @@ function update(timestamp) {
     const obs = obstacles[i];
     obs.x -= obs.speed;
 
+    //Ajuste de hitbox
+    const playerHitbox = {
+      x: player.x + hitboxMargin,
+      y: player.y + hitboxMargin,
+      width: player.width - hitboxMargin * 2,
+      height: player.height - hitboxMargin * 2
+    };
+
+    const obsHitbox = {
+      x: obs.x + hitboxMargin,
+      y: obs.y + hitboxMargin,
+      width: obs.width - hitboxMargin * 2,
+      height: obs.height - hitboxMargin * 2
+    };
+
     // Colisão
     if (
-      player.x < obs.x + obs.width &&
-      player.x + player.width > obs.x &&
-      player.y + player.height > obs.y
+      playerHitbox.x < obsHitbox.x + obsHitbox.width &&
+      playerHitbox.x + playerHitbox.width > obsHitbox.x &&
+      playerHitbox.y < obsHitbox.y + obsHitbox.height &&
+      playerHitbox.y + playerHitbox.height > obsHitbox.y
     ) {
       gameOver = true;
     }
@@ -113,9 +133,8 @@ update(timestamp);
   ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
 
   // Obstáculos
-  ctx.fillStyle = "#FF6347";
   for (const obs of obstacles) {
-    ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+    ctx.drawImage(obstaculosImg, obs.x, obs.y, obs.width, obs.height);
   }
 
   // Pontuação
