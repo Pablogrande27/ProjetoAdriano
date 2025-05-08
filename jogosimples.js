@@ -31,7 +31,7 @@ let nextObstacleDelay = getRandomDelay();
 let score = 0;
 let gameOver = false;
 
-const hitboxMargin = 10;
+const hitboxMargin = 14; // Margem da Hitbox, quanto maior o número, menor a hitbox
 
 function getRandomDelay() {
   return Math.random() * 1500 + 1000; // entre 1s e 2.5s
@@ -144,9 +144,16 @@ update(timestamp);
 
   // Fim de jogo
   if (gameOver) {
-    ctx.fillStyle = "black";
-    ctx.font = "40px Arial";
-    ctx.fillText("Game Over", canvas.width / 2 - 100, canvas.height / 2);
+    ctx.fillStyle = "white";
+    ctx.fillRect(269, 145, 280, 86);
+    ctx.strokeStyle = "red";
+    ctx.strokeRect(269, 145, 280, 86);
+    ctx.fillStyle = "red";
+    ctx.font = "bold italic 40px Arial";
+    ctx.shadowColor = "black";
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 2;
+    ctx.fillText("REPROVADO", canvas.width / 2 - 120, canvas.height / 2);
   } else {
     requestAnimationFrame(draw);
   }
