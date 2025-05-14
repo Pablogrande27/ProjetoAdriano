@@ -12,3 +12,20 @@ canvas {
     border: 2px solid #000;
     background-color: #add8e6; /* Azul claro */
   }
+.button {
+    border: 2px solid #1504aa;
+    background-color: white;
+    color: black;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: solid;
+    display: inline-block;
+    transition-duration: 0.4s;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+.button:hover {
+    background-color: #1504aa;
+    color: white;
+}

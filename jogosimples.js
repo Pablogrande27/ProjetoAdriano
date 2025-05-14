@@ -1,13 +1,14 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+
 const backgroundImg = new Image();
-backgroundImg.src = "jogo.jpeg"; // Caminho da imagem de fundo
+backgroundImg.src = "jogo.jpeg";
 
 const playerImg = new Image();
-  playerImg.src = "images.png"; // caminho da imagem personagem
+playerImg.src = "char.png";
 
 const obstaculosImg = new Image();
- obstaculosImg.src = "mesajogo.png"; //caminho imagem do obstaculo
+obstaculosImg.src = "mesajogo.png";
 
 let backgroundX = 0;
 const backgroundSpeed = 2; // Velocidade do fundo
@@ -16,7 +17,7 @@ const groundY = 300;
 const player = {
   x: 100,
   y: groundY,
-  width: 80,
+  width: 40,
   height: 80,
   velY: 0,
   gravity: 0.5,
@@ -27,18 +28,18 @@ const player = {
 let obstacles = [];
 let lastObstacleTime = 0;
 let nextObstacleDelay = getRandomDelay();
-
 let score = 0;
 let gameOver = false;
 
-const hitboxMargin = 14; // Margem da Hitbox, quanto maior o número, menor a hitbox
+const hitboxMargin = 7.5;
+let animationId = null; // <- controle da animação
 
 function getRandomDelay() {
-  return Math.random() * 1500 + 1000; // entre 1s e 2.5s
+  return Math.random() * 1500 + 1000;
 }
 
 document.addEventListener("keydown", (e) => {
-  if (e.code === "Space" && !player.jumping) {
+  if (e.code === "Space" && !player.jumping && !gameOver) {
     player.velY = player.jumpStrength;
     player.jumping = true;
   }
@@ -66,11 +67,12 @@ function update(timestamp) {
     player.velY = 0;
     player.jumping = false;
   }
+
   backgroundX -= backgroundSpeed;
   if (backgroundX <= -canvas.width) {
     backgroundX = 0;
   }
-  // Spawning de obstáculos com atraso aleatório
+
   if (!lastObstacleTime || timestamp - lastObstacleTime > nextObstacleDelay) {
     spawnObstacle();
     lastObstacleTime = timestamp;
@@ -105,6 +107,14 @@ function update(timestamp) {
       playerHitbox.y + playerHitbox.height > obsHitbox.y
     ) {
       gameOver = true;
+
+      const restartBtn = document.getElementById("restartBtn");
+      restartBtn.style.display = "block";
+      restartBtn.style.position = "absolute";
+
+      const canvasRect = canvas.getBoundingClientRect();
+      restartBtn.style.left = `${canvasRect.left + canvas.width / 2 - 90}px`;
+      restartBtn.style.top = `${canvasRect.top + canvas.height / 2 + 50}px`;
     }
 
     // Remove obstáculos que saíram da tela
@@ -116,17 +126,15 @@ function update(timestamp) {
 }
 
 function draw(timestamp) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
+  ctx.drawImage(backgroundImg, backgroundX, 0, canvas.width, canvas.height);
+  ctx.drawImage(backgroundImg, backgroundX + canvas.width, 0, canvas.width, canvas.height);
 
+  update(timestamp);
 
-// Fundo com imagem
-ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
-ctx.drawImage(backgroundImg, backgroundX, 0, canvas.width, canvas.height);
-ctx.drawImage(backgroundImg, backgroundX + canvas.width, 0, canvas.width, canvas.height);
-
-update(timestamp);
-  // Chão
-  ctx.fillStyle = "	#5F9EA0";
+  ctx.fillStyle = "#5F9EA0";
   ctx.fillRect(0, groundY + player.height, canvas.width, 100);
 
   // Jogador
@@ -145,17 +153,41 @@ update(timestamp);
   // Fim de jogo
   if (gameOver) {
     ctx.fillStyle = "white";
-    ctx.fillRect(269, 145, 280, 86);
+    ctx.fillRect(255, 145, 280, 86);
     ctx.strokeStyle = "red";
-    ctx.strokeRect(269, 145, 280, 86);
+    ctx.strokeRect(255, 145, 280, 86);
     ctx.fillStyle = "red";
     ctx.font = "bold italic 40px Arial";
-    ctx.shadowColor = "black";
-    ctx.shadowOffsetX = 2;
-    ctx.shadowOffsetY = 2;
-    ctx.fillText("REPROVADO", canvas.width / 2 - 120, canvas.height / 2);
+    ctx.fillText("REPROVADO", canvas.width / 2 - 132, canvas.height / 2);
   } else {
-    requestAnimationFrame(draw);
+    animationId = requestAnimationFrame(draw); // salva o ID da animação
   }
 }
-requestAnimationFrame(draw);
+
+document.getElementById("restartBtn").addEventListener("click", () => {
+  // Cancela o frame anterior para evitar sobreposição
+  if (animationId) {
+    
+    cancelAnimationFrame(animationId);
+    animationId = null;
+    
+  }
+
+  player.y = groundY;
+  player.velY = 0;
+  player.jumping = false;
+
+  obstacles = [];
+  score = 0;
+  gameOver = false;
+  lastObstacleTime = 0;
+  nextObstacleDelay = getRandomDelay();
+  backgroundX = 0;
+
+  document.getElementById("restartBtn").style.display = "none";
+
+  animationId = requestAnimationFrame(draw); // reinicia corretamente
+  
+});
+
+animationId = requestAnimationFrame(draw); // primeira chamada
