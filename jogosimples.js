@@ -31,6 +31,10 @@ let nextObstacleDelay = getRandomDelay();
 let score = 0;
 let gameOver = false;
 
+let jumpSound = new Audio("jump.mp3");
+let gameOverSound = new Audio("gameover.mp3");
+let pointSound = new Audio("point.mp3");
+
 const hitboxMargin = 7.7;
 let animationId = null; // <- controle da animação
 
@@ -42,6 +46,7 @@ document.addEventListener("keydown", (e) => {
   if (e.code === "Space" && !player.jumping && !gameOver) {
     player.velY = player.jumpStrength;
     player.jumping = true;
+    jumpSound.play();
   }
 });
 
@@ -107,6 +112,7 @@ function update(timestamp) {
       playerHitbox.y + playerHitbox.height > obsHitbox.y
     ) {
       gameOver = true;
+      gameOverSound.play();
 
       const restartBtn = document.getElementById("restartBtn");
       restartBtn.style.display = "block";
@@ -121,6 +127,7 @@ function update(timestamp) {
     if (obs.x + obs.width < 0) {
       obstacles.splice(i, 1);
       score++;
+      pointSound.play();
     }
   }
 }
