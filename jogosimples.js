@@ -31,7 +31,7 @@ let nextObstacleDelay = getRandomDelay();
 let score = 0;
 let gameOver = false;
 
-const hitboxMargin = 7.5;
+const hitboxMargin = 7.7;
 let animationId = null; // <- controle da animação
 
 function getRandomDelay() {
